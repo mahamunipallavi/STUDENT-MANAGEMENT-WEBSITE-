@@ -1,1 +1,130 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Management System</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+h1 { text-align: center; color: #2457a7; }
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: #2457a7;
+  color: white;
+  cursor: pointer;
+}
+.add { width: 100%; margin-top: 10px; }
+.student {
+  background: #eef3ff;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.delete { background: #dc3545; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Student Management</h1>
+<p>Manage student details, attendance and marks.</p>
+
+<input id="name" placeholder="Student Name">
+<input id="usn" placeholder="USN">
+<input id="attendance" type="number" placeholder="Attendance (%)" min="0" max="100">
+<input id="marks" type="number" placeholder="Marks" min="0" max="100">
+
+<button class="add" onclick="addStudent()">Add Student</button>
+
+<h2>Student Records</h2>
+<div id="records"></div>
+</div>
+
+<script>
+let students = JSON.parse(localStorage.getItem("students") || "[]");
+
+function displayStudents() {
+  const records = document.getElementById("records");
+  records.replaceChildren();
+
+  students.forEach((s, index) => {
+    const card = document.createElement("div");
+    card.className = "student";
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Name: " + s.name +
+      " | USN: " + s.usn +
+      " | Attendance: " + s.attendance + "%" +
+      " | Marks: " + s.marks;
+
+    const del = document.createElement("button");
+    del.textContent = "Delete";
+    del.className = "delete";
+    del.onclick = () => {
+      students.splice(index, 1);
+      save();
+    };
+
+    card.append(details, del);
+    records.appendChild(card);
+  });
+}
+
+function addStudent() {
+  const name = document.getElementById("name").value.trim();
+  const usn = document.getElementById("usn").value.trim();
+  const attendance = document.getElementById("attendance").value;
+  const marks = document.getElementById("marks").value;
+
+  if (!name || !usn || attendance === "" || marks === "") {
+    alert("Please fill all details!");
+    return;
+  }
+
+  if (+attendance < 0 || +attendance > 100 ||
+      +marks < 0 || +marks > 100) {
+    alert("Attendance and marks must be between 0 and 100.");
+    return;
+  }
+
+  students.push({name, usn, attendance, marks});
+  save();
+
+  document.querySelectorAll("input").forEach(input => {
+    input.value = "";
+  });
+}
+
+function save() {
+  localStorage.setItem("students", JSON.stringify(students));
+  displayStudents();
+}
+
+displayStudents();
+</script>
+</body>
+</html>
+
